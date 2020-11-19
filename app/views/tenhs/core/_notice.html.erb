@@ -1,0 +1,14 @@
+<div id="sysNotice" class="fixed-top mx-auto my-2 notice" style="max-width:300px;display:none;">
+  <% if notice.present? || alert.present? %>
+    <% if notice.present? %>
+      <div class="alert alert-info" role="alert">
+	<i class="fa fa-check-circle"></i> <%= notice %>
+      </div>
+    <% end %>
+    <% if alert.present? %>
+      <div class="alert alert-danger" role="alert">
+	<i class="fa fa-exclamation-triangle"></i> <%= alert %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
