@@ -14,7 +14,7 @@ class Tenhs::Core::WxpayService
       signType: "MD5",
     }
     jsapi_params[:paySign] = Tenhs::Core::SignService.sign(jsapi_params, config[:api_secret]).upcase
-    Rails.logger.debug "JSAPI params: #{params}"
+    Rails.logger.debug "JSAPI params: #{jsapi_params}"
     jsapi_params
   end
 
