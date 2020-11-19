@@ -83,7 +83,7 @@ class Tenhs::Core::WxpayService
 
   def self.prepay_param(pay_param, config, open_id, trade_type)
     params = {
-      appid: [:appid],
+      appid: config[:appid],
       mch_id: config[:mchid],
       nonce_str: Random::DEFAULT.rand(10 ** 16).to_s,
       trade_type: trade_type,
