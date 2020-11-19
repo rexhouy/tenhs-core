@@ -66,7 +66,7 @@ class Tenhs::Core::IpaynowService
 
   ## 发送请求，返回结果Hash
   def self.post(params)
-    resp = HttpService.post("pay.ipaynow.cn", "443", "/", URI.encode_www_form(params))
+    resp = Tenhs::Core::HttpService.post("pay.ipaynow.cn", "443", "/", URI.encode_www_form(params))
     ret = Rack::Utils.parse_nested_query(resp.body)
     Rails.logger.debug "接收到的参数： #{ret}"
     ret

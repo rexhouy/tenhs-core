@@ -48,7 +48,7 @@ class Tenhs::Core::WechatService
 
   ## 获取使用jsapi的token
   def self.jsapi(appid, url)
-    ticket = HttpService.get("wechat.tenqsd.com", 80, "/jsapi_ticket", {
+    ticket = Tenhs::Core::HttpService.get("wechat.tenqsd.com", 80, "/jsapi_ticket", {
       appid: appid,
     }, false)
     data = {
@@ -57,7 +57,7 @@ class Tenhs::Core::WechatService
       timestamp: Time.current.to_i,
       url: url,
     }
-    data[:signature] = SignService.sha1(data)
+    data[:signature] = Tenhs::Core::SignService.sha1(data)
     data[:appid] = appid
     data
   end

@@ -38,7 +38,7 @@ class Tenhs::Core::WxpayService
     params[:sign] = Tenhs::Core::SignService.sign(params, config[:api_secret]).upcase
     xml_params = params.to_xml(root: "xml", dasherize: false)
     Rails.logger.debug "micropay request params: #{xml_params}"
-    resp = HttpService.post("api.mch.weixin.qq.com", "443", "/pay/micropay", xml_params)
+    resp = Tenhs::Core::HttpService.post("api.mch.weixin.qq.com", "443", "/pay/micropay", xml_params)
     Rails.logger.debug "Get prepay id response: #{resp.body}"
     Hash.from_xml(resp.body.gsub("\n", ""))
   end
@@ -55,7 +55,7 @@ class Tenhs::Core::WxpayService
     params[:sign] = Tenhs::Core::SignService.sign(params, config[:api_secret]).upcase
     xml_params = params.to_xml(root: "xml", dasherize: false)
     Rails.logger.debug "Prepay request params: #{xml_params}"
-    resp = HttpService.post("api.mch.weixin.qq.com", "443", "/pay/orderquery", xml_params)
+    resp = Tenhs::Core::HttpService.post("api.mch.weixin.qq.com", "443", "/pay/orderquery", xml_params)
     Hash.from_xml(resp.body.gsub("\n", ""))
   end
 
@@ -68,7 +68,7 @@ class Tenhs::Core::WxpayService
 
   def self.get_prepay_id(pay_param, config, open_id, trade_type = "JSAPI")
     params = prepay_param(pay_param, config, open_id, trade_type)
-    resp = HttpService.post("api.mch.weixin.qq.com", "443", "/pay/unifiedorder", params)
+    resp = Tenhs::Core::HttpService.post("api.mch.weixin.qq.com", "443", "/pay/unifiedorder", params)
     Rails.logger.debug "Get prepay id response: #{resp.body}"
     resp_xml = Hash.from_xml(resp.body.gsub("\n", ""))
     if "SUCCESS".eql? resp_xml["xml"]["return_code"].upcase
