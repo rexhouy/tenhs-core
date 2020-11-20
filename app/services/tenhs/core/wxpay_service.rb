@@ -59,7 +59,25 @@ class Tenhs::Core::WxpayService
     Hash.from_xml(resp.body.gsub("\n", ""))
   end
 
-  # 后台通知校验
+  # 5. 订单退款
+  # refund_param = {transaction_id: "", out_refund_no: "", total_fee: "", refund_fee: "",notify_url: ""}
+  def self.refund(refund_param, config)
+    key = File.read(Rails.root.join("config", "wxpaykey.pem"))
+    cert = File.read(Rails.root.join("config", "wxpaycert.pem"))
+
+    params = {
+      appid: config[:appid],
+      mch_id: config[:mchid],
+      nonce_str: Random::DEFAULT.rand(10 ** 16).to_s,
+    }.merge(refund_param)
+    params[:sign] = Tenhs::Core::SignService.sign(params, config[:api_secret]).upcase
+    Rails.logger.debug "Refund request params: #{params}"
+
+    resp = Tenhs::Core::HttpService.secure_post_xml(cert, key, config[:mchid], params.to_xml(root: "xml", dasherize: false))
+    Hash.from_xml(resp.gsub("\n", ""))
+  end
+
+  # 6. 后台通知校验
   def self.verify(notify_params, config)
     Tenhs::Core::SignService.verify(notify_params, config[:api_secret])
   end

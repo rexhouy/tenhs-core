@@ -5,7 +5,13 @@
 routes.rb:
 
 ```ruby
-mount Xzqh::Engine => "/"
+mount Tenhs::Core::Engine => "/core"
+```
+
+引入 css 控件
+
+```erb
+<%= stylesheet_link_tag 'tenhs/vendor' %>
 ```
 
 引入 js 控件
