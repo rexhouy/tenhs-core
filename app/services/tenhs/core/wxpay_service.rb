@@ -1,4 +1,10 @@
 # coding: utf-8
+### 1. JSAPI支付
+### 2. 扫码支付
+### 3. 付款码支付(POS机)
+### 4. 交易结果查询
+### 5. 订单退款
+### 6. 后台通知校验
 ## config = {appid: "", mchid: "", api_secret: "", sub_mchid: "子商户号", sub_appid: "子商户公众号"}
 class Tenhs::Core::WxpayService
 
@@ -71,15 +77,55 @@ class Tenhs::Core::WxpayService
       nonce_str: Random::DEFAULT.rand(10 ** 16).to_s,
     }.merge(refund_param)
     params[:sign] = Tenhs::Core::SignService.sign(params, config[:api_secret]).upcase
-    Rails.logger.debug "Refund request params: #{params}"
 
-    resp = Tenhs::Core::HttpService.secure_post_xml(cert, key, config[:mchid], params.to_xml(root: "xml", dasherize: false))
+    Rails.logger.debug "Refund request params: #{params}"
+    xml_params = params.to_xml(root: "xml", dasherize: false)
+
+    resp = Tenhs::Core::HttpService.secure_post_xml(cert, key, config[:mchid], "", xml_params)
     Hash.from_xml(resp.gsub("\n", ""))
   end
 
   # 6. 后台通知校验
   def self.verify(notify_params, config)
     Tenhs::Core::SignService.verify(notify_params, config[:api_secret])
+  end
+
+  # 7. 企业付款
+  # t_params = {openid: "", amount: "", desc: "企业付款备注", partner_trade_no: "商户订单号"}
+  def self.transfer(t_params, config)
+    key = File.read(Rails.root.join("config", "wxpaykey.pem"))
+    cert = File.read(Rails.root.join("config", "wxpaycert.pem"))
+    params = {
+      mch_appid: config[:appid].to_s, #公众账号appid
+      mchid: config[:mchid].to_s, #商户号
+      nonce_str: Random::DEFAULT.rand(10 ** 16).to_s, #随机字符串
+      check_name: "NO_CHECK", #校验用户姓名选项
+    }.merge(t_params)
+    params[:sign] = Tenhs::Core::SignService.sign(params, config[:api_secret]).upcase
+    Rails.logger.debug "Refund request params: #{params}"
+    xml_params = params.to_xml(root: "xml", dasherize: false)
+    resp = Tenhs::Core::HttpService.secure_post_xml(cert, key, config[:mchid], "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers", xml_params)
+    Hash.from_xml(resp.gsub("\n", ""))
+  end
+
+  # 8. 发放红包
+  # r_params = {re_openid: "", send_name: "商户名称", total_amount: "", wishing: "红包祝福语", act_name: "活动名称"}
+  def self.red_pack(r_params, config)
+    key = File.read(Rails.root.join("config", "wxpaykey.pem"))
+    cert = File.read(Rails.root.join("config", "wxpaycert.pem"))
+    params = {
+      wxappid: config[:appid].to_s, #公众账号appid
+      mch_id: config[:mchid].to_s, #商户号
+      nonce_str: Random::DEFAULT.rand(10 ** 16).to_s, #随机字符串
+      check_name: "NO_CHECK", #校验用户姓名选项
+      total_num: "1", #红包数量
+      client_ip: Rails.application.config.server_ip,
+    }.merge(r_params)
+    params[:sign] = Tenhs::Core::SignService.sign(params, config[:api_secret]).upcase
+    Rails.logger.debug "Refund request params: #{params}"
+    xml_params = params.to_xml(root: "xml", dasherize: false)
+    resp = Tenhs::Core::HttpService.secure_post_xml(cert, key, config[:mchid], "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack", xml_params)
+    Hash.from_xml(resp.gsub("\n", ""))
   end
 
   private

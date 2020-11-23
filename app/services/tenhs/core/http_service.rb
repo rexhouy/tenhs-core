@@ -3,6 +3,7 @@ require "net/http"
 require "json"
 require "base64"
 require "digest/md5"
+require "faraday"
 
 class Tenhs::Core::HttpService
   def self.post(host, port, path, params, ssl = true)
@@ -27,17 +28,16 @@ class Tenhs::Core::HttpService
     resp
   end
 
-  def self.secure_post_xml(cert, key, key_pwd, params)
+  def self.secure_post_xml(cert, key, key_pwd, url, params)
     client_cert = OpenSSL::X509::Certificate.new(cert)
     client_key = OpenSSL::PKey::RSA.new(key, key_pwd)
 
     conn = Faraday.new(ssl: { client_cert: client_cert, client_key: client_key }, headers: { "Content-Type" => "application/xml" }) do |faraday|
       faraday.adapter Faraday.default_adapter
     end
-    resp = conn.post(WECHAT["transfer"]["path"], params)
+    resp = conn.post(url, params)
     Rails.logger.debug "Transfer response: #{resp.body}"
-    resp_xml = Hash.from_xml(resp.body.gsub("\n", ""))
-    resp_xml
+    resp.body
   end
 
   def self.get(host, port, path, params, ssl = true)
