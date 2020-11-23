@@ -109,7 +109,7 @@ class Tenhs::Core::WxpayService
   end
 
   # 8. 发放红包
-  # r_params = {re_openid: "", send_name: "商户名称", total_amount: "", wishing: "红包祝福语", act_name: "活动名称"}
+  # r_params = {re_openid: "", send_name: "商户名称", total_amount: "", wishing: "红包祝福语", act_name: "活动名称", mch_billno: "订单号"}
   def self.red_pack(r_params, config)
     key = File.read(Rails.root.join("config", "wxpaykey.pem"))
     cert = File.read(Rails.root.join("config", "wxpaycert.pem"))
@@ -117,7 +117,6 @@ class Tenhs::Core::WxpayService
       wxappid: config[:appid].to_s, #公众账号appid
       mch_id: config[:mchid].to_s, #商户号
       nonce_str: Random::DEFAULT.rand(10 ** 16).to_s, #随机字符串
-      check_name: "NO_CHECK", #校验用户姓名选项
       total_num: "1", #红包数量
       client_ip: Rails.application.config.server_ip,
     }.merge(r_params)
