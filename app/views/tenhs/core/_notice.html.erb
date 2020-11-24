@@ -2,12 +2,12 @@
   <% if notice.present? || alert.present? %>
     <% if notice.present? %>
       <div class="alert alert-info" role="alert">
-	<i class="fa fa-check-circle"></i> <%= notice %>
+	      <i class="fa fa-check-circle"></i> <%= notice %>
       </div>
     <% end %>
     <% if alert.present? %>
       <div class="alert alert-danger" role="alert">
-	<i class="fa fa-exclamation-triangle"></i> <%= alert %>
+	      <i class="fa fa-exclamation-triangle"></i> <%= alert %>
       </div>
     <% end %>
   <% end %>
