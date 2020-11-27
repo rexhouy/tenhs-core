@@ -42,6 +42,7 @@
     });
     $(".popover-container").popover();
     $(".tooltip-container").tooltip();
+    $('[data-toggle="popover"]').popover();
     wysiwyg.init();
     $("#sysNotice").show().delay(5000).fadeOut();
   });

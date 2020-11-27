@@ -11,7 +11,7 @@ class Tenhs::Core::CaptchaController < ActionController::Base
     captcha.token = SecureRandom.random_number(10 ** 6).to_s.rjust(6, "0")
     captcha.sent_at = DateTime.current + 10.minutes
 
-    Tenhs::Core::SmsService.send_captcha(captcha.token, captcha.mobile, Rails.application.config.sms)
+    Tenhs::Core::SmsService.send_captcha(captcha.token, captcha.mobile)
 
     captcha.save
     render json: { status: "ok" }

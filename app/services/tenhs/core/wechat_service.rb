@@ -3,7 +3,7 @@ class Tenhs::Core::WechatService
 
   # 用户验证
   # 1. 重定向到验证页面
-  def self.auth_url(request_url, config, scope = "snsapi_base")
+  def self.auth_url(request_url, scope = "snsapi_base")
     appid = get_appid(config)
     state = { redirect_url: request_url, appid: appid }.to_json
     params = {
@@ -18,7 +18,7 @@ class Tenhs::Core::WechatService
 
   # 用户验证
   # 获取用户信息(需scope为 snsapi_userinfo)
-  def self.get_user_info(openid, access_token, config)
+  def self.get_user_info(openid, access_token)
     http = Net::HTTP.new("wechat.tenqsd.com", 80)
     http.set_debug_output(Rails.logger)
     req = Net::HTTP::Get.new("/user/user_info?openid=#{openid}&access_token=#{access_token}&appid=#{get_appid(config)}")
@@ -29,7 +29,7 @@ class Tenhs::Core::WechatService
 
   # 发送模版消息
   # url消息链接， data消息模板数据
-  def self.message(openid, template_id, url, data, config)
+  def self.message(openid, template_id, url, data)
     http = Net::HTTP.new("wechat.tenqsd.com", 80)
     req = Net::HTTP::Post.new("/user/message")
     req.set_form_data ({
@@ -65,8 +65,14 @@ class Tenhs::Core::WechatService
   private
 
   ## 如果是特约商户并且特约商户有自己的公众号，则使用特约商户的公众号信息
-  def self.get_appid(config)
+  def self.get_appid
     return config[:sub_appid] if config[:sub_appid].present?
     config[:appid]
+  end
+
+  def self.config
+    c = Rails.application.config.wechat
+    return c.call if c.class.name == "Proc"
+    c
   end
 end

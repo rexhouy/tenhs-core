@@ -10,8 +10,8 @@ class Tenhs::Core::WxpayService
 
   # 1. JSAPI支付
   # pay_param = {body: "", detail: "", out_trade_no: "", total_fee: "",spbill_create_ip: "", notify_url: ""}
-  def self.pay(pay_param, config, openid)
-    ret = get_prepay_id(pay_param, config, openid)
+  def self.pay(pay_param, openid)
+    ret = get_prepay_id(pay_param, openid)
     jsapi_params = {
       appId: config[:appid],
       timeStamp: Time.current.to_i,
@@ -26,14 +26,14 @@ class Tenhs::Core::WxpayService
 
   # 2. 扫码支付
   # pay_param = {body: "", detail: "", out_trade_no: "", total_fee: "",spbill_create_ip: "", notify_url: ""}
-  def self.scan(pay_param, config, openid)
-    ret = get_prepay_id(pay_param, config, openid, "NATIVE")
+  def self.scan(pay_param, openid)
+    ret = get_prepay_id(pay_param, openid, "NATIVE")
     ret[:code_url]
   end
 
   # 3. 付款码支付(POS机)
   # pay_param = {body: "", detail: "", out_trade_no: "", total_fee: "",spbill_create_ip: ""}
-  def self.micropay(pay_param, config, code)
+  def self.micropay(pay_param, code)
     params = {
       appid: config[:appid],
       mch_id: config[:mchid],
@@ -50,7 +50,7 @@ class Tenhs::Core::WxpayService
   end
 
   # 4. 交易结果查询
-  def self.query(out_trade_no, config)
+  def self.query(out_trade_no)
     params = {
       appid: config[:appid],
       mch_id: config[:mchid],
@@ -67,7 +67,7 @@ class Tenhs::Core::WxpayService
 
   # 5. 订单退款
   # refund_param = {transaction_id: "", out_refund_no: "", total_fee: "", refund_fee: "",notify_url: ""}
-  def self.refund(refund_param, config)
+  def self.refund(refund_param)
     key = File.read(Rails.root.join("config", "wxpaykey.pem"))
     cert = File.read(Rails.root.join("config", "wxpaycert.pem"))
 
@@ -86,13 +86,13 @@ class Tenhs::Core::WxpayService
   end
 
   # 6. 后台通知校验
-  def self.verify(notify_params, config)
+  def self.verify(notify_params)
     Tenhs::Core::SignService.verify(notify_params, config[:api_secret])
   end
 
   # 7. 企业付款
   # t_params = {openid: "", amount: "", desc: "企业付款备注", partner_trade_no: "商户订单号"}
-  def self.transfer(t_params, config)
+  def self.transfer(t_params)
     key = File.read(Rails.root.join("config", "wxpaykey.pem"))
     cert = File.read(Rails.root.join("config", "wxpaycert.pem"))
     params = {
@@ -110,7 +110,7 @@ class Tenhs::Core::WxpayService
 
   # 8. 发放红包
   # r_params = {re_openid: "", send_name: "商户名称", total_amount: "", wishing: "红包祝福语", act_name: "活动名称", mch_billno: "订单号"}
-  def self.red_pack(r_params, config)
+  def self.red_pack(r_params)
     key = File.read(Rails.root.join("config", "wxpaykey.pem"))
     cert = File.read(Rails.root.join("config", "wxpaycert.pem"))
     params = {
@@ -129,8 +129,8 @@ class Tenhs::Core::WxpayService
 
   private
 
-  def self.get_prepay_id(pay_param, config, open_id, trade_type = "JSAPI")
-    params = prepay_param(pay_param, config, open_id, trade_type)
+  def self.get_prepay_id(pay_param, open_id, trade_type = "JSAPI")
+    params = prepay_param(pay_param, open_id, trade_type)
     resp = Tenhs::Core::HttpService.post("api.mch.weixin.qq.com", "443", "/pay/unifiedorder", params)
     Rails.logger.debug "Get prepay id response: #{resp.body}"
     resp_xml = Hash.from_xml(resp.body.gsub("\n", ""))
@@ -144,7 +144,7 @@ class Tenhs::Core::WxpayService
     end
   end
 
-  def self.prepay_param(pay_param, config, open_id, trade_type)
+  def self.prepay_param(pay_param, open_id, trade_type)
     params = {
       appid: config[:appid],
       mch_id: config[:mchid],
@@ -166,5 +166,13 @@ class Tenhs::Core::WxpayService
     params[:sign] = Tenhs::Core::SignService.sign(params, config[:api_secret]).upcase
     Rails.logger.debug "Prepay request params: #{params}"
     params.to_xml(root: "xml", dasherize: false)
+  end
+
+  private
+
+  def self.config
+    c = Rails.application.config.wechat
+    return c.call if c.class.name == "Proc"
+    c
   end
 end

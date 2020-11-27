@@ -6,7 +6,7 @@ require "digest/md5"
 
 class Tenhs::Core::SmsService
   # config: {auth_token: "", account_id: "", app_id: "", template_id: ""}
-  def self.send_captcha(captcha, tel, config)
+  def self.send_captcha(captcha, tel)
     if Rails.env.development?
       Rails.logger.info "CAPTCHA [#{captcha}] not send to #{tel} in development enviroment."
       return
@@ -30,5 +30,11 @@ class Tenhs::Core::SmsService
     req["Authorization"] = Base64.urlsafe_encode64(config[:account_id] + ":" + timestamp)
     resp = http.request(req)
     Rails.logger.info "Send CAPTCHA response #{resp.inspect}"
+  end
+
+  def self.config
+    c = Rails.application.config.sms
+    return c.call if c.class.name == "Proc"
+    c
   end
 end

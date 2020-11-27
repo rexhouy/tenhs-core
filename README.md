@@ -8,10 +8,17 @@ routes.rb:
 mount Tenhs::Core::Engine => "/core"
 ```
 
+application.rb
+
+```ruby
+config.sms = {auth_token: "", account_id: "", app_id: "", template_id: ""}
+config.wechat = {appid: "", mchid: "", api_secret: "", sub_mchid: "子商户号", sub_appid: "子商户公众号"}
+```
+
 引入 css 控件
 
 ```erb
-<%= stylesheet_link_tag 'tenhs/vendor' %>
+<%= stylesheet_link_tag 'tenhs/core' %>
 ```
 
 includes:
@@ -21,12 +28,10 @@ includes:
 
 ```erb
 <%= javascript_include_tag 'tenhs/core' %>
-<%= javascript_include_tag 'tenhs/vendor' %>
 ```
 
 includes:
-core = [captcha, helper, impage_uploader, init, wangEditor, wysiwyg]
-vendor = [cropper, jquery-ui, jquery.datetimepicker, mustache, popper]
+jquery, cropper, jquery-ui, jquery.datetimepicker, mustache, popper, captcha, helper, impage_uploader, init, wangEditor, wysiwyg
 
 wysiwyg 使用方法：
 
@@ -75,8 +80,8 @@ include Tenhs::Core::Common
 wechat 提供的方法
 
 ```ruby
-wechat_auth(config, scope = "snsapi_base")
-wechat_userinfo(config) # 使用sns_userinfo时获取用户数据
+wechat_auth(scope = "snsapi_base")
+wechat_userinfo # 使用sns_userinfo时获取用户数据
 wechat? # 客户端是否是wechat
 ```
 

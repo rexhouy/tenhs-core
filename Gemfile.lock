@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tenhs-core (0.1.4)
+    tenhs-core (0.1.9)
       faraday (~> 1.1.0)
       rails (~> 5.2.2)
 
