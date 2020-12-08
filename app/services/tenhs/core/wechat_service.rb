@@ -4,7 +4,7 @@ class Tenhs::Core::WechatService
   # 用户验证
   # 1. 重定向到验证页面
   def self.auth_url(request_url, scope = "snsapi_base")
-    appid = get_appid(config)
+    appid = get_appid
     state = { redirect_url: request_url, appid: appid }.to_json
     params = {
       appid: appid,
@@ -21,7 +21,7 @@ class Tenhs::Core::WechatService
   def self.get_user_info(openid, access_token)
     http = Net::HTTP.new("wechat.tenqsd.com", 80)
     http.set_debug_output(Rails.logger)
-    req = Net::HTTP::Get.new("/user/user_info?openid=#{openid}&access_token=#{access_token}&appid=#{get_appid(config)}")
+    req = Net::HTTP::Get.new("/user/user_info?openid=#{openid}&access_token=#{access_token}&appid=#{get_appid}")
     resp = http.request(req)
     Rails.logger.info "get user info response #{resp.body}"
     JSON.parse(resp.body)
@@ -33,7 +33,7 @@ class Tenhs::Core::WechatService
     http = Net::HTTP.new("wechat.tenqsd.com", 80)
     req = Net::HTTP::Post.new("/user/message")
     req.set_form_data ({
-                        appid: get_appid(config),
+                        appid: get_appid,
                         openid: openid,
                         template_id: template_id,
                         url: url,
@@ -47,9 +47,9 @@ class Tenhs::Core::WechatService
   end
 
   ## 获取使用jsapi的token
-  def self.jsapi(appid, url)
+  def self.jsapi(url)
     ticket = Tenhs::Core::HttpService.get("wechat.tenqsd.com", 80, "/jsapi_ticket", {
-      appid: appid,
+      appid: config[:appid],
     }, false)
     data = {
       noncestr: SecureRandom.hex(12),

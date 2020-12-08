@@ -17,7 +17,7 @@
         var originWidth = this.width;
         var originHeight = this.height;
         // 最大尺寸限制
-        var maxWidth = 1000,
+        var maxWidth = 800,
           maxHeight = 1000;
         // 目标尺寸
         var targetWidth = originWidth,
@@ -60,7 +60,7 @@
       compress(files[0], function (img) {
         data.append("file", img, file.name);
         helper.startProgress();
-        $.ajax("/admin/images", {
+        $.ajax("/core/images", {
           type: "POST",
           data: data,
           cache: false,
