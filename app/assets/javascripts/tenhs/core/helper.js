@@ -31,7 +31,7 @@
       }
     },
     csrfToken: function () {
-      $('meta[name="csrf-token"]').attr("content");
+      return $('meta[name="csrf-token"]').attr("content");
     },
     numberToCurrency: function (n) {
       return "￥ " + formatMoney(Number(n));
@@ -52,6 +52,10 @@
       $.get(url, params, function (data) {
         $("#ajaxModalContent").html(data);
       });
+    },
+    notice: function (msg) {
+      $("#sysNotice").html('<div class="alert alert-info" role="alert"><i class="fa fa-check-circle"></i> ' + msg + "</div>");
+      $("#sysNotice").show().delay(5000).fadeOut();
     },
     countdown: function ($btn) {
       if (countdownTimer <= 0) {

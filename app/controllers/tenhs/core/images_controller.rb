@@ -1,6 +1,6 @@
 # encoding: utf-8
 class Tenhs::Core::ImagesController < ActionController::Base
-  protect_from_forgery with: :exception
+  skip_before_action :verify_authenticity_token
 
   def create
     return render json: { filelink: Tenhs::Core::UploadService.image(params[:file]) } if Rails.env.development? # 测试保存在本地
