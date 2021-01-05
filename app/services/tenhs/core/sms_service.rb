@@ -12,7 +12,7 @@ class Tenhs::Core::SmsService
       return
     end
     Rails.logger.info "Send CAPTCHA(#{captcha}) to #{tel}"
-    time = DateTime.current.strftime("%Y%m%d%H%M%S")
+    timestamp = DateTime.current.strftime("%Y%m%d%H%M%S")
     sig = Digest::MD5.hexdigest(config[:account_id] + config[:auth_token] + timestamp)
     path = "/2013-12-26/Accounts/8a48b5514e3e5862014e4d8dbcfd0e32/SMS/TemplateSMS?sig=#{sig}"
     http = Net::HTTP.new("sandboxapp.cloopen.com", 8883)

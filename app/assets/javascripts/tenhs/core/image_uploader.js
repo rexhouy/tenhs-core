@@ -18,11 +18,11 @@
      * @param width 图片宽度
      * @param height 图片高度
      */
-    self.upload = function (imgId, srcId, url, width, height) {
+    self.upload = function (imgId, srcId, url, width, height, callback) {
       url = url || "/admin/images";
       var file = window.event.target.files[0];
       compress(file, width, height, function (img) {
-        save(img, file.name, imgId, srcId, url);
+        save(img, file.name, imgId, srcId, url, callback);
       });
     };
 
@@ -66,12 +66,12 @@
 
     self.uploadAfterCrop = function () {
       var canvas = cropper.getCroppedCanvas({ width: cropWidth, height: cropHeight }).toBlob(function (blob) {
-        save(blob, fileName, targetImgId, targetSrcId, uploadUrl);
+        save(blob, fileName, targetImgId, targetSrcId, uploadUrl, null);
         $("#cropperModal").modal("hide");
       });
     };
 
-    var save = function (img, name, imgId, srcId, url) {
+    var save = function (img, name, imgId, srcId, url, callback) {
       var data = new FormData();
       data.append("file", img, name);
       helper.startProgress();
@@ -86,6 +86,9 @@
         success: function (data, textStatus, jqXHR) {
           $(imgId).val(data.filelink);
           $(srcId).attr("src", data.filelink);
+	  if (callback) {
+	    callback(data.filelink);
+	  }
           helper.endProgress();
         },
       });
