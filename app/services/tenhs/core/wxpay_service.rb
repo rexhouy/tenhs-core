@@ -5,6 +5,8 @@
 ### 4. 交易结果查询
 ### 5. 订单退款
 ### 6. 后台通知校验
+### 7. 企业付款
+### 8. 发放红包
 ## config = {appid: "", mchid: "", api_secret: "", sub_mchid: "子商户号", sub_appid: "子商户公众号"}
 class Tenhs::Core::WxpayService
 

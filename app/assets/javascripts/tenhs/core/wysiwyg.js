@@ -2,7 +2,7 @@
   window.wysiwyg = (function () {
     var self = {};
 
-    var menus = ["head", "bold", "italic", "underline", "fontSize", "foreColor", "justify", "link", "image", "undo", "redo"];
+    var menus = ["head", "bold", "italic", "underline", "fontSize", "foreColor", "justify", "link", "image"];
 
     var compress = function (file, callback) {
       var reader = new FileReader(),

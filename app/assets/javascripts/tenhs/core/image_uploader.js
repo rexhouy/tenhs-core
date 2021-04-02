@@ -58,6 +58,7 @@
         cropper = new Cropper(image, {
           aspectRatio: radio,
           maxContainerWidth: 600,
+	  maxContainerHeight: 600,
           dragMode: "move",
         });
         $("#cropperModal").modal("show");
