@@ -20,10 +20,17 @@
      */
     self.upload = function (imgId, srcId, url, width, height, callback) {
       url = url || "/admin/images";
-      var file = window.event.target.files[0];
-      compress(file, width, height, function (img) {
-        save(img, file.name, imgId, srcId, url, callback);
-      });
+      for (var i = 0; i < window.event.target.files.length; i++) {
+        var file = window.event.target.files[i];
+        // var file = window.event.target.files[0];
+        if (width == 0 && height == 0) {
+          save(file, file.name, imgId, srcId, url, callback);
+        } else {
+          compress(file, width, height, function (img) {
+            save(img, file.name, imgId, srcId, url, callback);
+          });
+        }
+      }
     };
 
     /*
@@ -36,8 +43,8 @@
      * @param height 图片高度
      * @param radio 图片radio
      */
-    var cropper, targetImgId, targetSrcId, fileName, cropWidth, cropHeight, uploadUrl;
-    self.cropAndUpload = function (imgId, srcId, url, width, height, radio) {
+    var cropper, targetImgId, targetSrcId, fileName, cropWidth, cropHeight, uploadUrl, uploadCallback;
+    self.cropAndUpload = function (imgId, srcId, url, width, height, radio, callback) {
       var file = window.event.target.files[0];
       targetImgId = imgId;
       targetSrcId = srcId;
@@ -46,6 +53,7 @@
       cropHeight = height;
       uploadUrl = url;
       radio = radio || 1;
+      uploadCallback = callback;
 
       var reader = new FileReader();
       reader.readAsDataURL(file);
@@ -58,7 +66,7 @@
         cropper = new Cropper(image, {
           aspectRatio: radio,
           maxContainerWidth: 600,
-	  maxContainerHeight: 600,
+          maxContainerHeight: 600,
           dragMode: "move",
         });
         $("#cropperModal").modal("show");
@@ -67,7 +75,7 @@
 
     self.uploadAfterCrop = function () {
       var canvas = cropper.getCroppedCanvas({ width: cropWidth, height: cropHeight }).toBlob(function (blob) {
-        save(blob, fileName, targetImgId, targetSrcId, uploadUrl, null);
+        save(blob, fileName, targetImgId, targetSrcId, uploadUrl, uploadCallback);
         $("#cropperModal").modal("hide");
       });
     };
@@ -87,9 +95,9 @@
         success: function (data, textStatus, jqXHR) {
           $(imgId).val(data.filelink);
           $(srcId).attr("src", data.filelink);
-	  if (callback) {
-	    callback(data.filelink);
-	  }
+          if (callback) {
+            callback(data.filelink);
+          }
           helper.endProgress();
         },
       });

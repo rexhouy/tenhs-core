@@ -17,21 +17,15 @@
         var originWidth = this.width;
         var originHeight = this.height;
         // 最大尺寸限制
-        var maxWidth = 800,
-          maxHeight = 1000;
+        var maxWidth = 500;
+
         // 目标尺寸
         var targetWidth = originWidth,
           targetHeight = originHeight;
         // 图片尺寸超过1000x1000的限制
-        if (originWidth > maxWidth || originHeight > maxHeight) {
-          if (originWidth / originHeight > maxWidth / maxHeight) {
-            // 更宽，按照宽度限定尺寸
+        if (originWidth > maxWidth) {
             targetWidth = maxWidth;
             targetHeight = Math.round(maxWidth * (originHeight / originWidth));
-          } else {
-            targetHeight = maxHeight;
-            targetWidth = Math.round(maxHeight * (originWidth / originHeight));
-          }
         }
 
         // canvas对图片进行缩放
@@ -43,7 +37,11 @@
         context.drawImage(img, 0, 0, targetWidth, targetHeight);
         // canvas转为Blob
         canvas.toBlob(function (blob) {
-          callback(blob);
+	  if (blob.size > file.size) {
+	    callback(file);
+	  } else {
+	    callback(blob);
+	  }
         }, file.type || "image/png");
       };
 
@@ -58,6 +56,10 @@
       var data = new FormData();
       var file = files[0];
       compress(files[0], function (img) {
+	if (img.size > 5 * 1024 * 1024) {
+	  alert("上传失败，图片尺寸过大。");
+	  return;
+	}
         data.append("file", img, file.name);
         helper.startProgress();
         $.ajax("/core/images", {

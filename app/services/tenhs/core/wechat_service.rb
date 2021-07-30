@@ -27,6 +27,17 @@ class Tenhs::Core::WechatService
     JSON.parse(resp.body)
   end
 
+  # 用户验证
+  # 获取用户信息(需scope为 snsapi_userinfo) 使用不一样的URL
+  def self.get_user_info_1(openid, access_token)
+    http = Net::HTTP.new("wechat.tenqsd.com", 80)
+    http.set_debug_output(Rails.logger)
+    req = Net::HTTP::Get.new("/cgi-bin/user/info?openid=#{openid}&access_token=#{access_token}&appid=#{get_appid}")
+    resp = http.request(req)
+    Rails.logger.info "get user info response #{resp.body}"
+    JSON.parse(resp.body)
+  end
+
   # 发送模版消息
   # url消息链接， data消息模板数据
   def self.message(openid, template_id, url, data)

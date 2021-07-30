@@ -12,6 +12,7 @@ class Tenhs::Core::HttpService
     http.set_debug_output(Rails.logger)
     req = Net::HTTP::Post.new(path)
     req.body = params
+    req["Accept-Encoding"] = "compress"
     resp = http.request(req)
     Rails.logger.debug "Query payment response: #{resp.body}"
     resp
